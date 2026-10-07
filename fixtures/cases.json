@@ -1,0 +1,745 @@
+{
+  "separators": [
+    " ",
+    "\t",
+    "\n",
+    "\u000b",
+    "\f",
+    "\r",
+    "",
+    " ",
+    " // boundary\n",
+    " \t// boundary\r \n "
+  ],
+  "pairs": [
+    [
+      "alpha",
+      "beta",
+      "alpha beta"
+    ],
+    [
+      "1",
+      "2",
+      "1 2"
+    ],
+    [
+      "1",
+      "e2",
+      "1 e2"
+    ],
+    [
+      "1e",
+      "+2",
+      "1e +2"
+    ],
+    [
+      "1e+",
+      "2",
+      "1e+ 2"
+    ],
+    [
+      "1E-",
+      "2",
+      "1E- 2"
+    ],
+    [
+      "*",
+      "*",
+      "* *"
+    ],
+    [
+      "/",
+      "/",
+      "/ /"
+    ],
+    [
+      ".",
+      ".",
+      ". ."
+    ],
+    [
+      "..",
+      ".",
+      ".. ."
+    ],
+    [
+      ".",
+      "..",
+      ". .."
+    ],
+    [
+      "=",
+      "=",
+      "= ="
+    ],
+    [
+      "!",
+      "=",
+      "! ="
+    ],
+    [
+      "<",
+      "=",
+      "< ="
+    ],
+    [
+      ">",
+      "=",
+      "> ="
+    ],
+    [
+      "=",
+      ">",
+      "= >"
+    ],
+    [
+      "-",
+      ">",
+      "- >"
+    ],
+    [
+      "&",
+      "&",
+      "& &"
+    ],
+    [
+      "|",
+      "|",
+      "| |"
+    ],
+    [
+      ":",
+      ":",
+      ": :"
+    ],
+    [
+      "1",
+      ".2",
+      "1 .2"
+    ],
+    [
+      ".",
+      "2",
+      ". 2"
+    ],
+    [
+      "1",
+      "..2",
+      "1..2"
+    ],
+    [
+      "1",
+      "...2",
+      "1...2"
+    ],
+    [
+      "2",
+      "*",
+      "2*"
+    ],
+    [
+      "**",
+      "*",
+      "***"
+    ],
+    [
+      "\"a\"",
+      "\"b\"",
+      "\"a\"\"b\""
+    ],
+    [
+      "\"x\"",
+      "match",
+      "\"x\"match"
+    ],
+    [
+      "a",
+      "(",
+      "a("
+    ],
+    [
+      ")",
+      "{",
+      "){"
+    ]
+  ],
+  "valid": [
+    {
+      "name": "empty",
+      "input": "",
+      "output": "",
+      "oracle": false,
+      "reason": "No expression"
+    },
+    {
+      "name": "whitespace only",
+      "input": "\t\n\u000b\f\r  ",
+      "output": "",
+      "oracle": false,
+      "reason": "No expression"
+    },
+    {
+      "name": "comment only",
+      "input": "// arbitrary é 👋\rstill comment",
+      "output": "",
+      "oracle": false,
+      "reason": "EOF comments are spec syntax; no expression"
+    },
+    {
+      "name": "projection",
+      "input": " * [ n > 1 ] { n, } ",
+      "output": "*[n>1]{n,}",
+      "oracle": true
+    },
+    {
+      "name": "multiply everything",
+      "input": "2 * *[0].n",
+      "output": "2* *[0].n",
+      "oracle": true
+    },
+    {
+      "name": "exponentiation",
+      "input": "2 ** 3",
+      "output": "2**3",
+      "oracle": true
+    },
+    {
+      "name": "EOF comment",
+      "input": "1 // eof",
+      "output": "1",
+      "oracle": false,
+      "reason": "groq-js requires LF after a comment"
+    },
+    {
+      "name": "CR comment content",
+      "input": "1 // ignored\r+ 9",
+      "output": "1",
+      "oracle": false,
+      "reason": "groq-js requires LF after a comment"
+    },
+    {
+      "name": "comment LF",
+      "input": "1 // ignored\r  +9\n + 2",
+      "output": "1+2",
+      "oracle": true
+    },
+    {
+      "name": "URL",
+      "input": " { \"url\": \"https://example.invalid/a//b?q=x y\" } ",
+      "output": "{\"url\":\"https://example.invalid/a//b?q=x y\"}",
+      "oracle": true
+    },
+    {
+      "name": "numbers",
+      "input": "[ 001, 3.140, 1e+2, 2E-3, -0, +4 ]",
+      "output": "[001,3.140,1e+2,2E-3,-0,+4]",
+      "oracle": true
+    },
+    {
+      "name": "ranges",
+      "input": "[1, 2, 3, 4][ 0 .. 2 ]",
+      "output": "[1,2,3,4][0..2]",
+      "oracle": true
+    },
+    {
+      "name": "exclusive range",
+      "input": "[1,2,3][ 0 ... 2 ]",
+      "output": "[1,2,3][0...2]",
+      "oracle": true
+    },
+    {
+      "name": "keyword range",
+      "input": "2 in 1 .. 3",
+      "output": "2 in 1..3",
+      "oracle": true
+    },
+    {
+      "name": "parentheses commas",
+      "input": " ( [ 1, 2, ] ) ",
+      "output": "([1,2,])",
+      "oracle": true
+    },
+    {
+      "name": "operators",
+      "input": "( 1 != 2 ) && ( 2 <= 3 ) || ( 3 >= 4 )",
+      "output": "(1!=2)&&(2<=3)||(3>=4)",
+      "oracle": true
+    },
+    {
+      "name": "dereference",
+      "input": "* [ _type == \"entry\" ] { \"other\": friend -> { name } }",
+      "output": "*[_type==\"entry\"]{\"other\":friend->{name}}",
+      "oracle": true
+    },
+    {
+      "name": "custom function",
+      "input": "fn local::copy($x) = $x {name}; local::copy({\"name\":\"one\"})",
+      "output": "fn local::copy($x)=$x{name};local::copy({\"name\":\"one\"})",
+      "oracle": true
+    },
+    {
+      "name": "custom arithmetic",
+      "input": "fn local::double($x) = $x * 2; local::double(3)",
+      "output": "fn local::double($x)=$x*2;local::double(3)",
+      "oracle": false,
+      "reason": "groq-js restricts custom function bodies to projections"
+    },
+    {
+      "name": "Unicode strings",
+      "input": " { \"é\": \"你好 👋 é \" } ",
+      "output": "{\"é\":\"你好 👋 é \"}",
+      "oracle": true
+    },
+    {
+      "name": "escaped closing double",
+      "input": " \"a\\\" // literal\" // end",
+      "output": "\"a\\\" // literal\"",
+      "oracle": false,
+      "reason": "EOF comment"
+    },
+    {
+      "name": "escaped closing single",
+      "input": " 'a\\' // literal' ",
+      "output": "'a\\' // literal'",
+      "oracle": true
+    },
+    {
+      "name": "even backslashes",
+      "input": " \"a\\\\\" + \"b\" ",
+      "output": "\"a\\\\\"+\"b\"",
+      "oracle": true
+    },
+    {
+      "name": "odd backslashes",
+      "input": " \"a\\\\\\\"b\" ",
+      "output": "\"a\\\\\\\"b\"",
+      "oracle": true
+    },
+    {
+      "name": "standard escapes",
+      "input": " [ \"\\'\\\"\\\\\\/\\b\\f\\n\\r\\t\", '\\'\\\"\\\\\\/\\b\\f\\n\\r\\t' ] ",
+      "output": "[\"\\'\\\"\\\\\\/\\b\\f\\n\\r\\t\",'\\'\\\"\\\\\\/\\b\\f\\n\\r\\t']",
+      "oracle": true
+    },
+    {
+      "name": "fixed escapes",
+      "input": " \"\\u0041\\u00e9\\uD83D\\uDE00\" ",
+      "output": "\"\\u0041\\u00e9\\uD83D\\uDE00\"",
+      "oracle": true
+    },
+    {
+      "name": "braced astral",
+      "input": " \"\\u{1F600}\\u{000000000000000041}\\u{10FFFF}\" ",
+      "output": "\"\\u{1F600}\\u{000000000000000041}\\u{10FFFF}\"",
+      "oracle": false,
+      "reason": "groq-js decodes braced astral escapes using fromCharCode"
+    },
+    {
+      "name": "literal controls",
+      "input": " \"a\n\r\t\u000b\f\u0000 b\" ",
+      "output": "\"a\n\r\t\u000b\f\u0000 b\"",
+      "oracle": true
+    },
+    {
+      "name": "retained nonwhitespace 5760",
+      "input": "   ",
+      "output": " ",
+      "oracle": false,
+      "reason": "Not GROQ whitespace; structural validation belongs to caller"
+    },
+    {
+      "name": "retained nonwhitespace 8192",
+      "input": "   ",
+      "output": " ",
+      "oracle": false,
+      "reason": "Not GROQ whitespace; structural validation belongs to caller"
+    },
+    {
+      "name": "retained nonwhitespace 8195",
+      "input": "   ",
+      "output": " ",
+      "oracle": false,
+      "reason": "Not GROQ whitespace; structural validation belongs to caller"
+    },
+    {
+      "name": "retained nonwhitespace 8232",
+      "input": "   ",
+      "output": " ",
+      "oracle": false,
+      "reason": "Not GROQ whitespace; structural validation belongs to caller"
+    },
+    {
+      "name": "retained nonwhitespace 8233",
+      "input": "   ",
+      "output": " ",
+      "oracle": false,
+      "reason": "Not GROQ whitespace; structural validation belongs to caller"
+    },
+    {
+      "name": "retained nonwhitespace 8239",
+      "input": "   ",
+      "output": " ",
+      "oracle": false,
+      "reason": "Not GROQ whitespace; structural validation belongs to caller"
+    },
+    {
+      "name": "retained nonwhitespace 8287",
+      "input": "   ",
+      "output": " ",
+      "oracle": false,
+      "reason": "Not GROQ whitespace; structural validation belongs to caller"
+    },
+    {
+      "name": "retained nonwhitespace 12288",
+      "input": " 　 ",
+      "output": "　",
+      "oracle": false,
+      "reason": "Not GROQ whitespace; structural validation belongs to caller"
+    },
+    {
+      "name": "retained nonwhitespace 65279",
+      "input": " ﻿ ",
+      "output": "﻿",
+      "oracle": false,
+      "reason": "Not GROQ whitespace; structural validation belongs to caller"
+    },
+    {
+      "name": "boundary alpha beta",
+      "input": "alpha beta",
+      "output": "alpha beta",
+      "oracle": false,
+      "reason": "Lexical token-boundary check; may not be a complete expression"
+    },
+    {
+      "name": "boundary 1 2",
+      "input": "1 2",
+      "output": "1 2",
+      "oracle": false,
+      "reason": "Lexical token-boundary check; may not be a complete expression"
+    },
+    {
+      "name": "boundary 1 e2",
+      "input": "1 e2",
+      "output": "1 e2",
+      "oracle": false,
+      "reason": "Lexical token-boundary check; may not be a complete expression"
+    },
+    {
+      "name": "boundary 1e +2",
+      "input": "1e +2",
+      "output": "1e +2",
+      "oracle": false,
+      "reason": "Lexical token-boundary check; may not be a complete expression"
+    },
+    {
+      "name": "boundary 1e+ 2",
+      "input": "1e+ 2",
+      "output": "1e+ 2",
+      "oracle": false,
+      "reason": "Lexical token-boundary check; may not be a complete expression"
+    },
+    {
+      "name": "boundary 1E- 2",
+      "input": "1E- 2",
+      "output": "1E- 2",
+      "oracle": false,
+      "reason": "Lexical token-boundary check; may not be a complete expression"
+    },
+    {
+      "name": "boundary * *",
+      "input": "* *",
+      "output": "* *",
+      "oracle": false,
+      "reason": "Lexical token-boundary check; may not be a complete expression"
+    },
+    {
+      "name": "boundary / /",
+      "input": "/ /",
+      "output": "/ /",
+      "oracle": false,
+      "reason": "Lexical token-boundary check; may not be a complete expression"
+    },
+    {
+      "name": "boundary . .",
+      "input": ". .",
+      "output": ". .",
+      "oracle": false,
+      "reason": "Lexical token-boundary check; may not be a complete expression"
+    },
+    {
+      "name": "boundary .. .",
+      "input": ".. .",
+      "output": ".. .",
+      "oracle": false,
+      "reason": "Lexical token-boundary check; may not be a complete expression"
+    },
+    {
+      "name": "boundary . ..",
+      "input": ". ..",
+      "output": ". ..",
+      "oracle": false,
+      "reason": "Lexical token-boundary check; may not be a complete expression"
+    },
+    {
+      "name": "boundary = =",
+      "input": "= =",
+      "output": "= =",
+      "oracle": false,
+      "reason": "Lexical token-boundary check; may not be a complete expression"
+    },
+    {
+      "name": "boundary ! =",
+      "input": "! =",
+      "output": "! =",
+      "oracle": false,
+      "reason": "Lexical token-boundary check; may not be a complete expression"
+    },
+    {
+      "name": "boundary < =",
+      "input": "< =",
+      "output": "< =",
+      "oracle": false,
+      "reason": "Lexical token-boundary check; may not be a complete expression"
+    },
+    {
+      "name": "boundary > =",
+      "input": "> =",
+      "output": "> =",
+      "oracle": false,
+      "reason": "Lexical token-boundary check; may not be a complete expression"
+    },
+    {
+      "name": "boundary = >",
+      "input": "= >",
+      "output": "= >",
+      "oracle": false,
+      "reason": "Lexical token-boundary check; may not be a complete expression"
+    },
+    {
+      "name": "boundary - >",
+      "input": "- >",
+      "output": "- >",
+      "oracle": false,
+      "reason": "Lexical token-boundary check; may not be a complete expression"
+    },
+    {
+      "name": "boundary & &",
+      "input": "& &",
+      "output": "& &",
+      "oracle": false,
+      "reason": "Lexical token-boundary check; may not be a complete expression"
+    },
+    {
+      "name": "boundary | |",
+      "input": "| |",
+      "output": "| |",
+      "oracle": false,
+      "reason": "Lexical token-boundary check; may not be a complete expression"
+    },
+    {
+      "name": "boundary : :",
+      "input": ": :",
+      "output": ": :",
+      "oracle": false,
+      "reason": "Lexical token-boundary check; may not be a complete expression"
+    },
+    {
+      "name": "boundary 1 .2",
+      "input": "1 .2",
+      "output": "1 .2",
+      "oracle": false,
+      "reason": "Lexical token-boundary check; may not be a complete expression"
+    },
+    {
+      "name": "boundary . 2",
+      "input": ". 2",
+      "output": ". 2",
+      "oracle": false,
+      "reason": "Lexical token-boundary check; may not be a complete expression"
+    },
+    {
+      "name": "boundary 1 ..2",
+      "input": "1 ..2",
+      "output": "1..2",
+      "oracle": false,
+      "reason": "Lexical token-boundary check; may not be a complete expression"
+    },
+    {
+      "name": "boundary 1 ...2",
+      "input": "1 ...2",
+      "output": "1...2",
+      "oracle": false,
+      "reason": "Lexical token-boundary check; may not be a complete expression"
+    },
+    {
+      "name": "boundary 2 *",
+      "input": "2 *",
+      "output": "2*",
+      "oracle": false,
+      "reason": "Lexical token-boundary check; may not be a complete expression"
+    },
+    {
+      "name": "boundary ** *",
+      "input": "** *",
+      "output": "***",
+      "oracle": false,
+      "reason": "Lexical token-boundary check; may not be a complete expression"
+    },
+    {
+      "name": "boundary \"a\" \"b\"",
+      "input": "\"a\" \"b\"",
+      "output": "\"a\"\"b\"",
+      "oracle": false,
+      "reason": "Lexical token-boundary check; may not be a complete expression"
+    },
+    {
+      "name": "boundary \"x\" match",
+      "input": "\"x\" match",
+      "output": "\"x\"match",
+      "oracle": false,
+      "reason": "Lexical token-boundary check; may not be a complete expression"
+    },
+    {
+      "name": "boundary a (",
+      "input": "a (",
+      "output": "a(",
+      "oracle": false,
+      "reason": "Lexical token-boundary check; may not be a complete expression"
+    },
+    {
+      "name": "boundary ) {",
+      "input": ") {",
+      "output": "){",
+      "oracle": false,
+      "reason": "Lexical token-boundary check; may not be a complete expression"
+    }
+  ],
+  "invalid": [
+    {
+      "name": "unterminated double",
+      "input": " \"hello",
+      "kind": "unterminated",
+      "offset": 1,
+      "reason": "unterminated string"
+    },
+    {
+      "name": "unterminated single",
+      "input": "'hello",
+      "kind": "unterminated",
+      "offset": 0,
+      "reason": "unterminated string"
+    },
+    {
+      "name": "dangling",
+      "input": "\"hello\\",
+      "kind": "escape",
+      "offset": 6,
+      "reason": "dangling backslash"
+    },
+    {
+      "name": "unknown",
+      "input": "\"\\q\"",
+      "kind": "escape",
+      "offset": 1,
+      "reason": "unknown escape"
+    },
+    {
+      "name": "short fixed",
+      "input": "\"\\u123\"",
+      "kind": "escape",
+      "offset": 1,
+      "reason": "four hexadecimal"
+    },
+    {
+      "name": "bad fixed",
+      "input": "\"\\u12x4\"",
+      "kind": "escape",
+      "offset": 1,
+      "reason": "four hexadecimal"
+    },
+    {
+      "name": "empty brace",
+      "input": "\"\\u{}\"",
+      "kind": "escape",
+      "offset": 1,
+      "reason": "hexadecimal digits"
+    },
+    {
+      "name": "unclosed brace",
+      "input": "\"\\u{41\"",
+      "kind": "escape",
+      "offset": 1,
+      "reason": "closing brace"
+    },
+    {
+      "name": "over maximum",
+      "input": "\"\\u{110000}\"",
+      "kind": "escape",
+      "offset": 1,
+      "reason": "invalid Unicode"
+    },
+    {
+      "name": "overflow",
+      "input": "\"\\u{ffffffffffffffffffff}\"",
+      "kind": "escape",
+      "offset": 1,
+      "reason": "invalid Unicode"
+    },
+    {
+      "name": "brace surrogate",
+      "input": "\"\\u{D800}\"",
+      "kind": "escape",
+      "offset": 1,
+      "reason": "invalid Unicode"
+    },
+    {
+      "name": "high surrogate",
+      "input": "\"\\uD800\"",
+      "kind": "escape",
+      "offset": 1,
+      "reason": "unpaired high"
+    },
+    {
+      "name": "low surrogate",
+      "input": "\"\\uDC00\"",
+      "kind": "escape",
+      "offset": 1,
+      "reason": "unpaired low"
+    },
+    {
+      "name": "high then scalar",
+      "input": "\"\\uD800\\u0041\"",
+      "kind": "escape",
+      "offset": 1,
+      "reason": "unpaired high"
+    },
+    {
+      "name": "reversed pair",
+      "input": "\"\\uDE00\\uD83D\"",
+      "kind": "escape",
+      "offset": 1,
+      "reason": "unpaired low"
+    },
+    {
+      "name": "braced low pair",
+      "input": "\"\\uD83D\\u{DE00}\"",
+      "kind": "escape",
+      "offset": 7,
+      "reason": "four hexadecimal"
+    },
+    {
+      "name": "UTF8 offset",
+      "input": "\"é👋\" + \"\\q\"",
+      "kind": "escape",
+      "offset": 12,
+      "reason": "unknown escape"
+    },
+    {
+      "name": "UTF8 opening offset",
+      "input": "\"é👋\" + \"unterminated",
+      "kind": "unterminated",
+      "offset": 11,
+      "reason": "unterminated string"
+    }
+  ]
+}

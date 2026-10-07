@@ -1,0 +1,79 @@
+{
+  "name": "groq-compiler",
+  "version": "0.1.0",
+  "description": "Compiles and minifies GROQ queries, with optional groq-js verification",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/josemanosalvas/groq-compiler.git"
+  },
+  "bin": {
+    "groq-compiler": "./dist/cli.js"
+  },
+  "files": [
+    "dist/",
+    "README.md",
+    "LICENSE"
+  ],
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./verify": {
+      "types": "./dist/verify.d.ts",
+      "default": "./dist/verify.js"
+    },
+    "./budget": {
+      "types": "./dist/budget.d.ts",
+      "default": "./dist/budget.js"
+    },
+    "./split": {
+      "types": "./dist/split.d.ts",
+      "default": "./dist/split.js"
+    },
+    "./types": {
+      "types": "./dist/types.d.ts",
+      "default": "./dist/types.js"
+    },
+    "./sanity": {
+      "types": "./dist/sanity.d.ts",
+      "default": "./dist/sanity.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "scripts": {
+    "build": "node scripts/clean.mjs dist && node node_modules/typescript/bin/tsc -p tsconfig.build.json",
+    "test": "vitest run",
+    "check": "node node_modules/typescript/bin/tsc --noEmit && oxlint --deny-warnings && oxfmt --check",
+    "format": "oxfmt",
+    "prepack": "npm run build"
+  },
+  "devDependencies": {
+    "@sanity/client": "^8.9.0",
+    "@types/node": "22.20.5",
+    "groq-js": "2.0.0",
+    "oxfmt": "0.72.0",
+    "oxlint": "1.87.0",
+    "typescript": "5.9.3",
+    "typescript-7": "npm:typescript@^7.0.2",
+    "vitest": "5.0.3"
+  },
+  "peerDependencies": {
+    "groq-js": "^2.0.0",
+    "typescript": "^5.9.0 || ^6.0.0"
+  },
+  "peerDependenciesMeta": {
+    "groq-js": {
+      "optional": true
+    },
+    "typescript": {
+      "optional": true
+    }
+  },
+  "engines": {
+    "node": ">=22.12.0"
+  }
+}

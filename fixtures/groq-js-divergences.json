@@ -1,0 +1,50 @@
+[
+  {
+    "name": "comment at end of input",
+    "input": "*[_type == \"entry\"] // trailing",
+    "compiler": "parses",
+    "printed": "*[_type==\"entry\"]",
+    "groqJs": "rejects",
+    "reason": "The GROQ specification ends a comment at a line feed or at the end of input; groq-js requires the line feed"
+  },
+  {
+    "name": "space before a call's parenthesis",
+    "input": "count ( * )",
+    "compiler": "parses",
+    "printed": "count(*)",
+    "groqJs": "rejects",
+    "reason": "The specification allows whitespace between tokens; groq-js requires the parenthesis to follow the name"
+  },
+  {
+    "name": "space before a call's parenthesis with a string argument",
+    "input": "length (\"ab\")",
+    "compiler": "parses",
+    "printed": "length(\"ab\")",
+    "groqJs": "rejects",
+    "reason": "The specification allows whitespace between tokens; groq-js requires the parenthesis to follow the name"
+  },
+  {
+    "name": "braced astral escape",
+    "input": "\"\\u{1F600}\"",
+    "compiler": "parses",
+    "printed": "\"\\u{1F600}\"",
+    "value": "😀",
+    "groqJs": "accepts",
+    "groqJsValue": "\uf600",
+    "reason": "groq-js decodes braced escapes with String.fromCharCode, truncating astral code points; the compiler keeps the spelling, so both texts still mean the same to groq-js"
+  },
+  {
+    "name": "unknown escape",
+    "input": "\"\\q\"",
+    "compiler": "SyntaxError",
+    "groqJs": "accepts",
+    "reason": "The specification has no \\q escape; groq-js accepts any escape character and decodes unknown ones as the text \"undefined\""
+  },
+  {
+    "name": "pipe without a call",
+    "input": "* | foo",
+    "compiler": "ParseError",
+    "groqJs": "accepts",
+    "reason": "groq-js skips `| name` when no parenthesis follows and returns the left-hand side; the compiler rejects it and compile falls back to the minified query, which groq-js reads the same way"
+  }
+]

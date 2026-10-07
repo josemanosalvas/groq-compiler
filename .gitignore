@@ -1,0 +1,13 @@
+node_modules/
+dist/
+coverage/
+*.tgz
+.vitest/
+# Measurements derived from the private corpus stay outside the repository.
+.private/
+
+# Local documentation and experiments are not part of the public repository.
+/docs/
+/PLAN.md
+/prototypes/
+/scripts/measure-*.mjs

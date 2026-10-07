@@ -1,0 +1,318 @@
+/**
+ * ---------------------------------------------------------------------------------
+ * Hand-written test fixture modeled on Sanity TypeGen output (`sanity typegen generate`):
+ * schema types, then one result type per query, then the global query registry.
+ * ---------------------------------------------------------------------------------
+ */
+
+export declare const internalGroqTypeReferenceTo: unique symbol;
+
+// Source: schema.json
+export type SanityImageAssetReference = {
+  _ref: string;
+  _type: "reference";
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+};
+
+export type SanityImageCrop = {
+  _type: "sanity.imageCrop";
+  top?: number;
+  bottom?: number;
+  left?: number;
+  right?: number;
+};
+
+export type SanityImageHotspot = {
+  _type: "sanity.imageHotspot";
+  x?: number;
+  y?: number;
+  height?: number;
+  width?: number;
+};
+
+// A schema type whose generated name looks like an alias name.
+export type SpanShape = {
+  _type: "spanShape";
+  corners?: number;
+};
+
+export type Hero = {
+  _type: "hero";
+  title?: string;
+  body?: Array<{
+    children?: Array<{
+      marks?: Array<string>;
+      text?: string;
+      _type: "span";
+      _key: string;
+    }>;
+    style?: "normal" | "h2" | "h3";
+    markDefs?: Array<{
+      href?: string;
+      _type: "link";
+      _key: string;
+    }>;
+    _type: "block";
+    _key: string;
+  }>;
+  image?: {
+    asset?: SanityImageAssetReference;
+    media?: unknown; // Unable to locate the referenced type "hero.image.media" in schema
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    _type: "image";
+  };
+};
+
+export type Cta = {
+  _type: "cta";
+  label?: string;
+  body?: Array<{
+    children?: Array<{
+      marks?: Array<string>;
+      text?: string;
+      _type: "span";
+      _key: string;
+    }>;
+    style?: "normal" | "h2" | "h3";
+    markDefs?: Array<{
+      href?: string;
+      _type: "link";
+      _key: string;
+    }>;
+    _type: "block";
+    _key: string;
+  }>;
+  image?: {
+    asset?: SanityImageAssetReference;
+    media?: unknown; // Unable to locate the referenced type "cta.image.media" in schema
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    _type: "image";
+  };
+};
+
+export type PageBuilder = Array<
+  | ({
+      _key: string;
+    } & Hero)
+  | ({
+      _key: string;
+    } & Cta)
+>;
+
+export type Page = {
+  _id: string;
+  _type: "page";
+  title?: string;
+  slug?: string;
+  pageBuilder?: PageBuilder;
+};
+
+export type AllSanitySchemaTypes =
+  | SanityImageAssetReference
+  | SanityImageCrop
+  | SanityImageHotspot
+  | SpanShape
+  | Hero
+  | Cta
+  | PageBuilder
+  | Page;
+
+// Source: queries.ts
+// Variable: pageQuery
+// Query: *[_type == "page" && slug.current == $slug][0]{ _id, title, "seo-title": seoTitle, image{ "id": asset._ref, alt, crop }, ... }
+export type PageQueryResult = {
+  _id: string;
+  title: string | null;
+  "seo-title": string | null;
+  image: {
+    id: string | null;
+    alt: string | null;
+    crop: {
+      _type: "sanity.imageCrop";
+      top?: number;
+      bottom?: number;
+      left?: number;
+      right?: number;
+    } | null;
+  } | null;
+  ogImage:
+    | {
+        id: string | null;
+        alt: string | null;
+        crop: {
+          _type: "sanity.imageCrop";
+          top?: number;
+          bottom?: number;
+          left?: number;
+          right?: number;
+        } | null;
+      }
+    | null;
+  pageBuilder: Array<
+    | {
+        _key: string;
+        _type: "hero";
+        title?: string;
+        body: Array<{
+          children?: Array<{
+            marks?: Array<string>;
+            text?: string;
+            _type: "span";
+            _key: string;
+          }>;
+          style?: "h2" | "h3" | "normal";
+          markDefs: Array<{
+            href?: string;
+            _type: "link";
+            _key: string;
+            openInNewTab: boolean | null;
+          }> | null;
+          _type: "block";
+          _key: string;
+        }> | null;
+        image: {
+          id: string | null;
+          alt: string | null;
+          crop: {
+            _type: "sanity.imageCrop";
+            top?: number;
+            bottom?: number;
+            left?: number;
+            right?: number;
+          } | null;
+        } | null;
+      }
+    | {
+        _key: string;
+        _type: "cta";
+        label: "Read \"more\" { now }" | 'it\'s } here' | null;
+        body: Array<{
+          children?: Array<{
+            marks?: Array<string>;
+            text?: string;
+            _type: "span";
+            _key: string;
+          }>;
+          style?: "h2" | "h3" | "normal";
+          markDefs: Array<{
+            href?: string;
+            _type: "link";
+            _key: string;
+            openInNewTab: boolean | null;
+          }> | null;
+          _type: "block";
+          _key: string;
+        }> | null;
+      }
+  > | null;
+} | null;
+
+// Source: queries.ts
+// Variable: pagesQuery
+// Query: *[_type == "page"]{ _id, title, thumbnail{ "id": asset._ref, alt, crop }, "cards": [[...]], order }
+export type PagesQueryResult = Array<{
+  _id: string;
+  title: string | null;
+  thumbnail: {
+    'id': string | null;
+    "alt": string | null;
+    crop: {
+      _type: "sanity.imageCrop";
+      top?: number;
+      bottom?: number;
+      left?: number;
+      right?: number;
+    } | null;
+  } | null;
+  cards: Array<
+    Array<{
+      title: string | null;
+      summary: string | null;
+      image: {
+        id: string | null;
+        alt: string | null;
+        crop: {
+          _type: "sanity.imageCrop";
+          top?: number;
+          bottom?: number;
+          left?: number;
+          right?: number;
+        } | null;
+      } | null;
+    }>
+  >;
+  order: {
+    title: string | null;
+    summary: string | null;
+    position: number;
+    pinned: boolean;
+  };
+  sameOrderAgain: {
+    title: string | null;
+    summary: string | null;
+    position: number;
+    pinned: boolean;
+  };
+  otherOrder: {
+    summary: string | null;
+    title: string | null;
+    position: number;
+    pinned: boolean;
+  };
+}>;
+
+// Source: queries.ts
+// Variable: settingsQuery
+// Query: *[_type == "settings"][0]{ logo{ "id": asset._ref, alt, crop }, footerLogo{ ... }, ... }
+export type SettingsQueryResult = {
+  logo: {
+    id: string | null; /* the logo } */
+    alt: string | null; // a { comment
+    crop: {
+      _type: "sanity.imageCrop";
+      top?: number;
+      bottom?: number;
+      left?: number;
+      right?: number;
+    } | null;
+  } | null;
+  footerLogo: {
+    readonly id: string | null;
+    alt: string | null;
+    crop: {
+      _type: "sanity.imageCrop";
+      top?: number;
+      bottom?: number;
+      left?: number;
+      right?: number;
+    } | null;
+  } | null;
+  footer: {
+    title: string | null;
+    summary: string | null;
+    position: number;
+    pinned: boolean;
+  } | null;
+  links: Array<{
+    href?: string;
+    _type: "link";
+    _key: string;
+    openInNewTab: boolean | null;
+  }>;
+} | null;
+
+// Query TypeMap
+declare global {
+  interface SanityQueries {
+    '*[_type == "page" && slug.current == $slug][0]{ _id, title, "seo-title": seoTitle, image{ "id": asset._ref, alt, crop }, ... }': PageQueryResult;
+    '*[_type == "page"]{ _id, title, thumbnail{ "id": asset._ref, alt, crop }, "cards": [[...]], order }': PagesQueryResult;
+    '*[_type == "settings"][0]{ logo{ "id": asset._ref, alt, crop }, footerLogo{ ... }, ... }': SettingsQueryResult;
+  }
+}
+// Lets @sanity/client releases that predate the global registry read it too
+declare module "@sanity/client" {
+  interface SanityQueries extends globalThis.SanityQueries {}
+}
